@@ -438,21 +438,22 @@ void Customer::viewReservations()
         cout << "No reservations found.\n";
 }
 
-bool Customer::Register()
-{
+int Customer::getCustomerId() const { return customerId; }
+string Customer::getFullName() const { return fullName; }
+string Customer::getPhone() const { return phone; }
+string Customer::getNationalId() const { return nationalId; }
+
+bool Customer::Register() {
     string fullName, username, password, phone, nationalId;
     cout << "Full Name: ";
-    cin.ignore();
+    //cin.ignore();
     getline(cin, fullName);
-
     cout << "Username: ";
     cin >> username;
-    if (usernameExists(username))
-    {
-        cout << "Username already exists \n";
+    if (usernameExists(username)) {
+        cout << "Username already exists";
         return false;
     }
-
     cout << "Password: ";
     cin >> password;
     cout << "Phone Number: ";
@@ -465,13 +466,8 @@ bool Customer::Register()
     users << userId << "," << username << "," << password << ",0\n";
     users.close();
     fstream customers("customers.txt", ios::out | ios::app);
-    customers << customerId << "," << userId << ","<< fullName << "," << phone << "," << nationalId << "\n";
+    customers << customerId << "," << userId << "," << fullName << "," << phone << "," << nationalId << "\n";
     customers.close();
     cout << "Customer registered successfully \n";
     return true;
 }
-
-int Customer::getCustomerId() const { return customerId; }
-string Customer::getFullName() const { return fullName; }
-string Customer::getPhone() const { return phone; }
-string Customer::getNationalId() const { return nationalId; }
