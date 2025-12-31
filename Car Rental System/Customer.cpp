@@ -233,6 +233,7 @@
 
 #include "Customer.h"
 #include "FileFunctions.h"
+#include "HelperFunction.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -345,46 +346,148 @@ int Customer::findCarIndexById(const vector<Cars>& cars, int id)
     return -1;
 }
 
+
+//void Customer::reserveCar()
+//{
+//    static int nextReservationId = 1; 
+//
+//    vector<Cars> cars = loadCars();
+//
+//    cout << "Available Cars:\n";
+//    viewAllAvaliableCars();
+//   /* for (auto& c : cars)
+//        if (c.isAvailable())
+//            cout << "CarID: " << c.carId << " | Cost per day: " << c.carRentalCost << endl;*/
+//
+//    int chosenId;
+//    cout << "\nEnter Car ID to reserve: ";
+//    cin >> chosenId;
+//
+//    int index = -1;
+//    for (int i = 0; i < cars.size(); i++)
+//        if (cars[i].carId == chosenId)
+//            index = i;
+//
+//    if (index == -1 || cars[index].isAvailable())
+//    {
+//        cout << "Car not available!\n";
+//        return;
+//    }
+//
+//    string start, end;
+//    cout << "Start Date (dd-mm-yyyy): ";
+//    cin >> start;
+//    cout << "End Date (dd-mm-yyyy): ";
+//    cin >> end;
+//
+//    int days = HelperFunctions::calculateDays(start, end);
+//    double cost = days * cars[index].carRentalCost;
+//
+//    
+//    Reservation r(
+//        nextReservationId++,
+//        customerId,
+//        cars[index].carId,
+//        start,
+//        end,
+//        days,
+//        cost
+//    );
+//
+//   
+//    cars[index].reserve();
+//    saveCars(cars);
+//
+//    
+//    saveReservation(r);
+//
+//    cout << "\nReservation Successful!\n";
+//    cout << "Total Cost: " << r.totalCost << endl;
+//}
 void Customer::reserveCar()
 {
+    static int nextReservationId = 1;
+
     vector<Cars> cars = loadCars();
+    vector<Driver> drivers = loadDrivers(); 
+
+    cout << "Available Cars:\n";
     viewAllAvaliableCars();
 
     int chosenId;
-    cout << "Enter Car ID to reserve: ";
+    cout << "\nEnter Car ID to reserve: ";
     cin >> chosenId;
 
-    int index = findCarIndexById(cars, chosenId);
-    if (index == -1)
+    int index = -1;
+    for (int i = 0; i < cars.size(); i++)
+        if (cars[i].carId == chosenId)
+            index = i;
+
+    if (index == -1 || cars[index].isAvailable())
     {
         cout << "Car not available!\n";
         return;
     }
 
     string start, end;
-    cout << "Start Date: ";
+    cout << "Start Date (dd-mm-yyyy): ";
     cin >> start;
-    cout << "End Date: ";
+    cout << "End Date (dd-mm-yyyy): ";
     cin >> end;
 
-    int days = 3;
+    int days = HelperFunctions::calculateDays(start, end);
     double cost = days * cars[index].carRentalCost;
 
-    Reservation r(rand() % 10000,
+    int driverId = -1; 
+    char wantDriver;
+    cout << "Do you want a driver? (y/n): ";
+    cin >> wantDriver;
+
+    if (wantDriver == 'y' || wantDriver == 'Y')
+    {
+        bool assigned = false;
+        for (auto& d : drivers)
+        {
+            if (!d.status) 
+            {
+                driverId = d.id;
+                d.status = 1; 
+                assigned = true;
+                break;
+            }
+        }
+        if (!assigned)
+        {
+            cout << "No drivers available. You can continue without a driver (c) or cancel reservation (x): ";
+            char choice;
+            cin >> choice;
+            if (choice == 'x' || choice == 'X') return; // ????? ?????
+        }
+    }
+
+    
+    Reservation r(
+        nextReservationId++,
         customerId,
         cars[index].carId,
         start,
         end,
         days,
-        cost);
-
-    cars[index].reserve();
+        cost,
+        driverId
+    );
+    cars[index].reserve(); 
     saveCars(cars);
     saveReservation(r);
+    saveDrivers(drivers); 
 
     cout << "\nReservation Successful!\n";
     cout << "Total Cost: " << r.totalCost << endl;
+    if (driverId != -1)
+        cout << "Driver assigned: " << driverId << endl;
 }
+
+
 void Customer::cancelReservation()
 {
     vector<Reservation> reservations = loadReservations();
@@ -406,15 +509,16 @@ void Customer::cancelReservation()
                 if (c.carId == r.carId)
                     c.makeAvailable();
 
-            updateReservation(r);
+            saveReservations(reservations);
             saveCars(cars);
 
-            cout << "Reservation canceled successfully \n";
+            cout << "Reservation canceled successfully\n";
             return;
         }
     }
-    cout << "Reservation not found \n";
+    cout << "Reservation not found\n";
 }
+
 void Customer::viewReservations()
 {
     vector<Reservation> reservations = loadReservations();
@@ -428,9 +532,13 @@ void Customer::viewReservations()
             cout << "ID: " << r.reservationId
                 << " | CarID: " << r.carId
                 << " | Status: " << r.status
-                << " | From: " << r.startDate
-                << " To: " << r.endDate
-                << " | Cost: " << r.totalCost << endl;
+                << " | From: " << r.startDate << " To: " << r.endDate
+                << " | Cost: " << r.totalCost;
+
+            if (r.driverId != -1)
+                cout << " | DriverID: " << r.driverId;
+
+            cout << endl;
             found = true;
         }
     }

@@ -65,14 +65,23 @@ vector<Reservation> loadReservations()
     return reservations;
 }
 
-void saveReservation(const Reservation &r)
+void saveReservations(const vector<Reservation>& reservations)
 {
+    ofstream file("reservations.txt"); 
+
+    for (const auto& r : reservations)
+    {
+        file << r.reservationId << "," << r.customerId << ","
+            << r.carId << "," << r.startDate << "," << r.endDate << ","
+            << r.totalDays << "," << r.totalCost << "," << r.status << endl;
+    }
+}
+void saveReservation(const Reservation &r) {
     ofstream file("reservations.txt", ios::app);
     file << r.reservationId << "," << r.customerId << ","
-         << r.carId << "," << r.startDate << "," << r.endDate << ","
-         << r.totalDays << "," << r.totalCost << "," << r.status << endl;
+        << r.carId << "," << r.startDate << "," << r.endDate
+        << "," << r.totalDays << "," << r.totalCost << "," << r.status << endl; 
 }
-
 void updateReservation(const Reservation &updatedRes)
 {
     vector<Reservation> reservations = loadReservations();
@@ -98,5 +107,32 @@ void updateReservation(const Reservation &updatedRes)
         file << r.reservationId << "," << r.customerId << ","
              << r.carId << "," << r.startDate << "," << r.endDate << ","
              << r.totalDays << "," << r.totalCost << "," << r.status << endl;
+    }
+}
+vector<Driver> loadDrivers() {
+    vector<Driver> drivers;
+    ifstream file("drivers.txt");
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+        stringstream ss(line);
+        Driver d;
+        string id, statusStr;
+        getline(ss, id, ',');
+        d.id = stoi(id);
+        getline(ss, d.uname, ',');
+        getline(ss, d.phone, ',');
+        getline(ss, statusStr);
+        d.status = (statusStr == "1"); // 1 = Available, 0 = Busy
+        drivers.push_back(d);
+    }
+    return drivers;
+}
+
+// Saving drivers to file
+void saveDrivers(const vector<Driver>& drivers) {
+    ofstream file("drivers.txt");
+    for (const auto& d : drivers) {
+        file << d.id << "," << d.uname << "," << d.phone << "," << (d.status ? "1" : "0") << endl;
     }
 }

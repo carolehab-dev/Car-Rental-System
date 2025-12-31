@@ -2,6 +2,7 @@
 #include <iostream>
 #include "AuthService.h"
 #include "Customer.h"
+#include "Cars.h"
 using namespace std;
 
 int showMainMenu() {
@@ -31,6 +32,8 @@ int showMainMenu() {
 }
 
 int main() {
+    
+    Cars::updateCarsStatus();
     while (true) {
         int choice = showMainMenu();
         if (choice == 0) {

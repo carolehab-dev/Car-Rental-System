@@ -3,6 +3,8 @@
 #include <sstream>
 #include "Cars.h"
 #include "File.h"
+#include "FileFunctions.h"
+#include "HelperFunction.h"
 
 vector<Cars> Cars::allCars;
 
@@ -47,20 +49,52 @@ void Cars::viewCarInfo(int id)
 
 void Cars::viewAllAvaliableCars()
 {
-   allCars.clear(); // added carol
+    allCars.clear(); // added carol
     readFromFile("cars.csv", allCars); //  added carol
     cout << "\n--- List of All Availiable Cars ---\n";
     for (const auto &c : allCars)
     {
-        if (c.availibility_status == 1)
+        if (c.availibility_status == 0)
         {
             cout << "ID: " << c.carId
                  << " | Model: " << c.model
                  << " | Color: " << c.color
                  << " | Car Number: " << c.carNum
                  << " | Rental Cost: " << c.carRentalCost
-                 << " | Status: " << c.availibility_status
+                 << " | Status: " << (c.availibility_status == 0 ? "is Available" : "Not Available")
                  << endl;
         }
     }
+
 }
+
+
+void Cars::updateCarsStatus()
+{
+    vector<Cars> cars = loadCars();
+    vector<Reservation> reservations = loadReservations();
+
+    for (auto& r : reservations)
+    {
+        if (r.status == "Active" && HelperFunctions::isEndDateFinished(r.endDate))
+        {
+            
+            r.status = "Finished";
+
+            
+            for (auto& car : cars)
+            {
+                if (car.carId == r.carId)
+                {
+                    car.availibility_status = 0; 
+                    break;
+                }
+            }
+        }
+    }
+
+    saveCars(cars);
+    saveReservations(reservations);
+}
+
+

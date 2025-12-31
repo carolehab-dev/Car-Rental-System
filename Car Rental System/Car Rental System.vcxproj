@@ -128,6 +128,7 @@
     <ClCompile Include="Cars.cpp" />
     <ClCompile Include="Customer.cpp" />
     <ClCompile Include="CustomerService.cpp" />
+    <ClCompile Include="Driver.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="FileFunctions.cpp" />
     <ClCompile Include="Manager.cpp" />
@@ -137,11 +138,16 @@
     <ClInclude Include="AuthService.h" />
     <ClInclude Include="Customer.h" />
     <ClInclude Include="CustomerService.h" />
+    <ClInclude Include="Driver.h" />
     <ClInclude Include="File.h" />
     <ClInclude Include="FileFunctions.h" />
+    <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="reservation.h" />
     <ClInclude Include="User.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="drivers.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

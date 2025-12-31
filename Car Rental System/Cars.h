@@ -5,7 +5,7 @@
 #include "File.h"
 using namespace std;
 
-class Cars : public File<Cars>
+class Cars  : public File<Cars>
 {
 
 public:
@@ -33,8 +33,9 @@ public:
     void viewCarInfo(int id);
 
     void reserve() { availibility_status = 1; }
-    void makeAvailable() { availibility_status = 1; }
+    void makeAvailable() { availibility_status = 0; }
     bool isAvailable() const { return availibility_status; }
+   static void  updateCarsStatus();
 };
 
 #endif
