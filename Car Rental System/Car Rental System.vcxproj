@@ -128,15 +128,18 @@
     <ClCompile Include="Cars.cpp" />
     <ClCompile Include="Customer.cpp" />
     <ClCompile Include="CustomerService.cpp" />
+    <ClCompile Include="Feedbacks.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="FileFunctions.cpp" />
     <ClCompile Include="Manager.cpp" />
+    <ClCompile Include="Reservation.cpp" />
     <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AuthService.h" />
     <ClInclude Include="Customer.h" />
     <ClInclude Include="CustomerService.h" />
+    <ClInclude Include="Feedbacks.h" />
     <ClInclude Include="File.h" />
     <ClInclude Include="FileFunctions.h" />
     <ClInclude Include="Manager.h" />
