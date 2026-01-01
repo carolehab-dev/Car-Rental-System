@@ -2,16 +2,11 @@
 #include <iostream>
 #include "AuthService.h"
 #include "Customer.h"
-<<<<<<< HEAD
-
-
 #include <vector>
 #include <thread>
 #include <chrono>
 #include <windows.h>
-=======
 #include "Cars.h"
->>>>>>> d4923948be1de561214247e2baa34149abdd07c0
 using namespace std;
 #define CYAN  "\033[1;36m"
 #define GREY  "\033[90m"
@@ -148,12 +143,8 @@ int showMainMenu() {
 }
 
 int main() {
-<<<<<<< HEAD
     showIntro();
-=======
-    
     Cars::updateCarsStatus();
->>>>>>> d4923948be1de561214247e2baa34149abdd07c0
     while (true) {
         int choice = showMainMenu();
         if (choice == 0) {
@@ -163,7 +154,6 @@ int main() {
             cin >> username;
             cout << "Password: ";
             cin >> password;
-
             User* user = AuthService::authenticate(username, password);
             if (user) {
                 user->login();

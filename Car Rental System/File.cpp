@@ -22,7 +22,7 @@ void File<T>::readFromFile(const string &filename, vector<T> &temp)
             return;
         }
         string line;
-        getline(file, line);
+       // getline(file, line);
 
         while (getline(file, line))
         {

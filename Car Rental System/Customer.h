@@ -46,10 +46,12 @@ public:
     void reserveCar();
     void cancelReservation();
     void viewReservations();
+    void createFeedback();
     int getCustomerId() const;
     string getFullName() const;
     string getPhone() const;
     string getNationalId() const;
+    
 
 private:
     int customerId;

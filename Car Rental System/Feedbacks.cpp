@@ -116,14 +116,18 @@ void Feedback::createFeedback(int resId, int custId, int carId)
     cout << " Rating: ";
     cin >> feed.rating;
     cout << " Comment: ";
-    cin >> feed.comment;
-
+   // cin >> feed.comment;
+    cin.ignore();
+    getline(cin, feed.comment);
     Feedback::feedbacks.push_back(feed);
     appendFeedback(feed);
+    return;
 };
 
 void Feedback::viewAllFeedbacks()
 {
+    feedbacks.clear();                               
+    loadFeedbacks(feedbacks, "feedbacks.csv");
     cout << "\n--- List of FeedBacks ---\n";
     for (const auto& f : feedbacks)
     {

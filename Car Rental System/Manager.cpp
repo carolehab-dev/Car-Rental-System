@@ -8,6 +8,7 @@
 #include "File.h"             
 #include "FileFunctions.h" 
 #include <conio.h>
+#include "Customer.h"
 using namespace std;
 int showVerticalMenu(
     const string& title,
@@ -45,14 +46,33 @@ void pauseScreen()
     cout << "\nPress any key to continue...";
     _getch();
 }
+
+static int getNextDriverId(const string& filename)
+{
+    fstream file(filename, ios::in);
+    string line, lastLine;
+
+    while (getline(file, line))
+        if (!line.empty()) lastLine = line;
+
+    if (lastLine.empty()) return 1;
+
+    string idStr;
+    stringstream ss(lastLine);
+    getline(ss, idStr, ',');
+    return stoi(idStr) + 1;
+}
 static vector<string> managerMenuOptions = {
-    "View All Cars",
+     "View All Cars",
     "View All Reservations",
     "View All Feedbacks",
     "Add Car",
     "Update Car",
     "Delete Car",
     "View Drivers",
+    "Add Driver",
+    "Update Driver",
+    "Delete Driver",
     "Logout"
 };
 //Manager::Manager() : User(), carManager() {};
@@ -84,17 +104,18 @@ void Manager::showMenu()
             break;
 
         case 1: { 
-            Reservation r;
-            r.viewAllReservation();
+            /*Reservation r;
+            r.viewAllReservation();*/
+            Reservation::loadFromFile();     
+            Reservation::viewAllReservation();
             pauseScreen();
             break;
         }
 
         case 2: { 
-           /* Feedback f;
+            Feedback f;
             f.viewAllFeedbacks();
-            pauseScreen();*/
-            cout << "Logging out...\n";
+            pauseScreen();
             break;
         }
 
@@ -104,28 +125,42 @@ void Manager::showMenu()
             break;
 
         case 4: // Update Car
-          /*  updateCar();
-            pauseScreen();*/
+            updateCar();
+            pauseScreen();
             cout << "Logging out...\n";
             break;
 
         case 5: // Delete Car
-           /* deleteCar();
-            pauseScreen();*/
+            deleteCar();
+            pauseScreen();
             cout << "Logging out...\n";
             break;
 
-        case 6: // View Drivers
-            // displayDrivers();
-            cout << "\n[Driver management not implemented yet]\n";
+        case 6:
+            viewDrivers();
             pauseScreen();
             break;
 
-        case 7: // Logout
+        case 7:
+            addDriver();
+            pauseScreen();
+            break;
+
+        case 8:
+            updateDriver();
+            pauseScreen();
+            break;
+
+        case 9:
+            deleteDriver();
+            pauseScreen();
+            break;
+
+        case 10:
             cout << "Logging out...\n";
             break;
         }
-    } while (choice != 7);
+    } while (choice != 10);
 }
 
 //// Read data from CSV file
@@ -204,6 +239,125 @@ void Manager::showMenu()
 //    }
 //}
 //
+// 
+// 
+void Manager::viewDrivers()
+{
+    vector<Driver> drivers = loadDrivers();
+
+    if (drivers.empty())
+    {
+        cout << "No drivers found.\n";
+        return;
+    }
+
+    cout << "\n--- Drivers List ---\n";
+    for (const auto& d : drivers)
+    {
+        cout << "DriverID: " << d.id
+            << " | UserID: " << d.getUserId()
+            << " | Username: " << d.uname
+            << " | Phone: " << d.phone
+            << " | NationalID: " << d.nid
+            << " | Status: " << (d.status ? "Available" : "Busy")
+            << endl;
+    }
+}
+void Manager::addDriver()
+{
+    string username, password, phone, nid;
+
+    cout << "\n--- Add New Driver ---\n";
+    cout << "Username: ";
+    cin >> username;
+    cout << "Password: ";
+    cin >> password;
+    cout << "Phone: ";
+    cin >> phone;
+    cout << "National ID: ";
+    cin >> nid;
+
+    int userId = getNextDriverId("users.txt");
+    int driverId =getNextDriverId("drivers.txt");
+
+    // users.txt
+    ofstream users("users.txt", ios::app);
+    users << userId << "," << username << "," << password << "," << Role_Driver << "\n";
+    users.close();
+
+    // drivers.txt
+    ofstream drivers("drivers.txt", ios::app);
+    drivers << driverId << "," << userId << "," << username << ","
+        << phone << "," << nid << ",1\n"; // available
+    drivers.close();
+
+    cout << "Driver added successfully.\n";
+}
+void Manager::updateDriver()
+{
+    viewDrivers();
+    vector<Driver> drivers = loadDrivers();
+    int driverId;
+    cout << "Enter Driver ID to update: ";
+    cin >> driverId;
+
+    bool found = false;
+    for (auto& d : drivers)
+    {
+        if (d.id == driverId)
+        {
+            cout << "New Phone: ";
+            cin >> d.phone;
+            cout << "Status (1 = Available, 0 = Busy): ";
+            cin >> d.status;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        cout << "Driver not found.\n";
+        return;
+    }
+
+    saveDrivers(drivers);
+    cout << "Driver updated successfully.\n";
+}
+void Manager::deleteDriver()
+{
+    viewDrivers();
+    vector<Driver> drivers = loadDrivers();
+
+    int driverId;
+    cout << "Enter Driver ID to delete: ";
+    cin >> driverId;
+
+    bool found = false;
+    auto it = drivers.begin();
+
+    while (it != drivers.end())
+    {
+        if (it->id == driverId)
+        {
+            it = drivers.erase(it);
+            found = true;
+            break;
+        }
+        else
+            ++it;
+    }
+
+    if (!found)
+    {
+        cout << "Driver not found.\n";
+        return;
+    }
+
+    saveDrivers(drivers);
+    cout << "Driver deleted successfully.\n";
+}
+
 //// Diplay Cars
 void Manager::viewAllCars()
 {
@@ -247,57 +401,67 @@ void Manager::addCar()
 
     cout << "Car added successfully.\n";
 }
-//
-//// Upadte A Car
-//void Manager::updateCar()
-//{
-//    int toBeUpadtedId = 0;
-//    int newRentalCost = 0;
-//    cout << "\n--- Specify The Car ID You Want To Update ---\n";
-//    cout << "Enter ID: ";
-//    cin >> toBeUpadtedId;
-//    bool found = false;
-//    for (auto &c : Cars::allCars)
-//    {
-//        if (c.carId == toBeUpadtedId)
-//        {
-//            cout << "Specify The Car New Rental Cost: ";
-//            cin >> newRentalCost;
-//            c.carRentalCost = newRentalCost;
-//            found = true;
-//        }
-//    }
-//    if (!found)
-//    {
-//        cout << "No Car Found With This ID \n";
-//    }
-//    carManager.saveToFile("cars.csv", Cars::allCars);
-//}
-//
-//// delete A Car
-//void Manager::deleteCar()
-//{
-//    int toBeDeletedId = 0;
-//    cout << "\n--- Specify The Car ID You Want To Delete ---\n";
-//    cout << "Enter ID: ";
-//    cin >> toBeDeletedId;
-//    bool found = false;
-//    auto itr = Cars::allCars.begin();
-//    while (itr != Cars::allCars.end())
-//    {
-//        if (itr->carId == toBeDeletedId)
-//        {
-//            itr = Cars::allCars.erase(itr);
-//            found = true;
-//        }
-//        else
-//        {
-//            itr++;
-//        }
-//    }
-//    if (!found)
-//    {
-//        cout << "No Car Found With This ID \n";
-//    }
-//    carManager.saveToFile("cars.csv", Cars::allCars);
-//}
+
+// Upadte A Car
+void Manager::updateCar()
+{
+    viewAllCars();
+    File<Cars> file;
+    Cars::allCars.clear();
+    file.readFromFile("cars.csv", Cars::allCars);
+    int toBeUpadtedId = 0;
+    int newRentalCost = 0;
+    cout << "\n--- Specify The Car ID You Want To Update ---\n";
+    cout << "Enter ID: ";
+    cin >> toBeUpadtedId;
+    bool found = false;
+    for (auto &c : Cars::allCars)
+    {
+        if (c.carId == toBeUpadtedId)
+        {
+            cout << "Specify The Car New Rental Cost: ";
+            cin >> newRentalCost;
+            c.carRentalCost = newRentalCost;
+            found = true;
+        }
+    }
+    if (!found)
+    {
+        cout << "No Car Found With This ID \n";
+    }
+    //carManager.saveToFile("cars.csv", Cars::allCars);
+    saveCars(Cars::allCars);
+}
+
+// delete A Car
+void Manager::deleteCar()
+{
+    viewAllCars();
+    File<Cars> file;
+    Cars::allCars.clear();
+    file.readFromFile("cars.csv", Cars::allCars);
+    int toBeDeletedId = 0;
+    cout << "\n--- Specify The Car ID You Want To Delete ---\n";
+    cout << "Enter ID: ";
+    cin >> toBeDeletedId;
+    bool found = false;
+    auto itr = Cars::allCars.begin();
+    while (itr != Cars::allCars.end())
+    {
+        if (itr->carId == toBeDeletedId)
+        {
+            itr = Cars::allCars.erase(itr);
+            found = true;
+        }
+        else
+        {
+            itr++;
+        }
+    }
+    if (!found)
+    {
+        cout << "No Car Found With This ID \n";
+    }
+   // carManager.saveToFile("cars.csv", Cars::allCars);
+    saveCars(Cars::allCars);
+}

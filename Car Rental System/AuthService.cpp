@@ -1,49 +1,7 @@
-﻿//#include "AuthService.h"
-//#include "User.h" 
-//#include "Customer.h"
-//#include <fstream>
-//#include <sstream>
-//#include<iostream>
-//using namespace std;
-//
-//
-//User* AuthService::authenticate(const string& username, const string& password) {
-//
-//    fstream file("users.txt", ios::in);
-//
-//    if (!file.is_open()) {
-//        cout << "failed\n";
-//        return nullptr;
-//    }
-//
-//    //beginning f
-//    file.seekg(0, ios::beg);
-//
-//    string line;
-//    while (getline(file, line)) {
-//        string idStr, u, p, roleStr;
-//        stringstream ss(line);
-//
-//        getline(ss, idStr, ',');
-//        getline(ss, u, ',');
-//        getline(ss, p, ',');
-//        getline(ss, roleStr, ',');
-//
-//        int role = stoi(roleStr);
-//
-//        cout << u << " | " << p << " | " << role << endl;
-//
-//        if (u == username && p == password) {
-//            if (role == 0) return new Customer();
-//        }
-//    }
-//
-//    return nullptr;
-//}
-
-#include "AuthService.h"
+﻿#include "AuthService.h"
 #include "Customer.h"
 #include "Manager.h"
+#include "Driver.h"
 //#include "Driver.h"
 #include <fstream>
 #include <sstream>
@@ -95,9 +53,36 @@ User* AuthService::authenticate(const string& username, const string& password) 
             else if (role == Role_Manager) {
                 return new Manager(userId, username);
             }
-            //else if (role == Role_Driver) {
-            //   // return new Driver(userId, username);
-            //}
+            else if (role == Role_Driver)
+            {
+                fstream drivers("drivers.txt", ios::in);
+                string dline;
+
+                while (getline(drivers, dline))
+                {
+                    stringstream ds(dline);
+                    string driverId, uid, uname, phone, statusStr;
+
+                    getline(ds, driverId, ',');
+                    getline(ds, uid, ',');
+                    getline(ds, uname, ',');
+                    getline(ds, phone, ',');
+                    getline(ds, statusStr);
+
+                    if (stoi(uid) == userId)
+                    {
+                        return new Driver(
+                            stoi(driverId),   // driverId
+                            userId,           // userId
+                            username,
+                            phone,
+                            "driver",
+                            "",
+                            statusStr == "1"
+                        );
+                    }
+                }
+            }
         }
     }
     return nullptr;

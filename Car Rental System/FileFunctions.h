@@ -15,7 +15,6 @@ void saveCars(const vector<Cars> &cars);
 vector<Reservation> loadReservations();
 void saveReservations(const vector<Reservation>& reservations);
 void saveReservation(const Reservation& r);
-void updateReservation(const Reservation &updatedRes);
 void saveDrivers(const vector<Driver>& drivers);
 vector<Driver> loadDrivers();
 

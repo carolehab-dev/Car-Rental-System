@@ -17,10 +17,10 @@ public:
     void showMenu() override;
     //Manager();
     void readDataFromFile(const string &filename);
-    //void addDriver(Driver d);
-    void updateDriver(int driverId, string newPhone);
-    void deleteDriver(int driverId);
-    void displayDrivers();
+    void viewDrivers();
+    void addDriver();
+    void updateDriver();
+    void deleteDriver();
 
     void viewAllCars();
     void addCar();

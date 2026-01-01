@@ -12,6 +12,7 @@ class User
 	virtual bool login() = 0; // pure virtual 
 	virtual void showMenu()=0;// pure virtual  
 	virtual ~User() {}
+	int getUserId() const { return user_Id; }
 protected:
 	int	user_Id;
 	string userName;

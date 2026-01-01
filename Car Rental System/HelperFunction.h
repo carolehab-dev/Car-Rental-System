@@ -56,8 +56,70 @@ public:
         return difftime(now, endTime) >= 0;
     }
 
-    
-    
+    ///////////////////////////////////////////////
+    static bool isValidDateFormat(const string& date) {
+        int d, m, y;
+        char sep1, sep2;
+        stringstream ss(date);
+
+        ss >> d >> sep1 >> m >> sep2 >> y;
+        return (!ss.fail() && sep1 == '-' && sep2 == '-' &&
+            d >= 1 && d <= 31 &&
+            m >= 1 && m <= 12 &&
+            y >= 1900);
+    }
+
+    // ==============================
+    // Check if date is in the future
+    // ==============================
+    static bool isDateInFuture(const string& date) {
+        int d, m, y;
+        char sep;
+        stringstream ss(date);
+        ss >> d >> sep >> m >> sep >> y;
+
+        tm dateTm = {};
+        dateTm.tm_mday = d;
+        dateTm.tm_mon = m - 1;
+        dateTm.tm_year = y - 1900;
+
+        time_t inputTime = mktime(&dateTm);
+
+        tm todayTm = {};
+        time_t now = time(nullptr);
+        localtime_s(&todayTm, &now);
+        todayTm.tm_hour = 0;
+        todayTm.tm_min = 0;
+        todayTm.tm_sec = 0;
+
+        time_t today = mktime(&todayTm);
+
+        return difftime(inputTime, today) > 0;
+    }
+
+    // ==============================
+    // Validate start & end dates
+    // ==============================
+    static bool validateStartEndDates(const string& start, const string& end) {
+
+        if (!isValidDateFormat(start) || !isValidDateFormat(end)) {
+            cout << "Invalid format. Use DD-MM-YYYY\n";
+            return false;
+        }
+
+        if (!isDateInFuture(start) || !isDateInFuture(end)) {
+            cout << "Dates must be in the future\n";
+            return false;
+        }
+
+        int days = calculateDays(start, end);
+        if (days <= 0) {
+            cout << " Start date must be before end date\n";
+            return false;
+        }
+
+        return true;
+    }
 };
 
 #endif

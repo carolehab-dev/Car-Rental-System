@@ -127,7 +127,6 @@
     <ClCompile Include="Car Rental System.cpp" />
     <ClCompile Include="Cars.cpp" />
     <ClCompile Include="Customer.cpp" />
-    <ClCompile Include="CustomerService.cpp" />
     <ClCompile Include="Driver.cpp" />
     <ClCompile Include="Feedbacks.cpp" />
     <ClCompile Include="File.cpp" />
@@ -139,7 +138,6 @@
   <ItemGroup>
     <ClInclude Include="AuthService.h" />
     <ClInclude Include="Customer.h" />
-    <ClInclude Include="CustomerService.h" />
     <ClInclude Include="Driver.h" />
     <ClInclude Include="Feedbacks.h" />
     <ClInclude Include="File.h" />
